@@ -14,8 +14,8 @@ type TasksState = {items:Task[], status:
     |'loading'
     |'succeeded'
     |'failed'
-    eror:|null;};
-const initialState: TasksState = { items:[], status:'idle',eror:null};
+    error:string |null;};
+const initialState: TasksState = { items:[], status:'idle',error:null};
 const taskSlice = createSlice({
     name:'tasks',
     initialState,
@@ -36,27 +36,28 @@ const taskSlice = createSlice({
             );
         }
     },
+    extraReducers:builder =>{
+        builder
+            .addCase(loadDemo.pending, state => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(loadDemo.fulfilled,(state,action)=>{
+                state.status = 'succeeded'
+                state.items = action.payload
+            })
+            .addCase(loadDemo.rejected,(state,action)=>{
+                state.status = 'failed'
+                state.error = action.payload??
+                action.error.message??'Неизвестная ошибка';
+                
+            })
+    }
 });
 export const {added,toggled} = taskSlice.actions;
 export default taskSlice.reducer;
 
-extraReducers:builder =>{
-    builder
-    .addCase(loadDemo.pending, state => {
-        state.status = 'loading';
-        state.error = null;
-    })
-    .addCase(loadDemo.fulfilled,(state,action)=>{
-        state.status = 'succeeded'
-        state.items = action.payload
-    })
-    .addCase(loadDemo.rejected,(state,action)=>{
-        state.status = 'failed'
-        state.error = action.payload??
-        action.error.message??'Неизвестная ошибка';
-        
-    })
-}
+
 
 // try{
 //     const tasks = await dispatch(loadDemo(false)).unwrap()
